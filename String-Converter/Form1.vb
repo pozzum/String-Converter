@@ -76,14 +76,13 @@ Public Class Form1
 
                 Using MyReader As New Microsoft.VisualBasic.FileIO.TextFieldParser(OpenCSVDialog.FileName)
                     MyReader.TextFieldType = Microsoft.VisualBasic.FileIO.FieldType.Delimited
-                    MyReader.Delimiters = New String() {","}
+                    MyReader.SetDelimiters({vbTab, ","})
                     Dim counter As Integer = 0
                     Do While Not MyReader.EndOfData
                         Try
                             TextArray = MyReader.ReadFields
                             Dim bytearray() As Byte
                             'MessageBox.Show(TextArray.Length)
-
                             Try
                                 bytearray = System.Text.Encoding.ASCII.GetBytes(TextArray(0))
                             Catch ex As Exception
