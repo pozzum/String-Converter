@@ -38,6 +38,7 @@ Partial Class Form1
         Me.Label5 = New System.Windows.Forms.Label()
         Me.SaveCSVDialog = New System.Windows.Forms.SaveFileDialog()
         Me.OpenPACHDialog = New System.Windows.Forms.OpenFileDialog()
+        Me.Button3 = New System.Windows.Forms.Button()
         CType(Me.Num_String_Count, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Num_Max_Length, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Num_Start_Num, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -69,7 +70,7 @@ Partial Class Form1
         Me.Num_String_Count.Name = "Num_String_Count"
         Me.Num_String_Count.Size = New System.Drawing.Size(83, 20)
         Me.Num_String_Count.TabIndex = 2
-        Me.Num_String_Count.Value = New Decimal(New Integer() {4249, 0, 0, 0})
+        Me.Num_String_Count.Value = New Decimal(New Integer() {8192, 0, 0, 0})
         '
         'Label1
         '
@@ -100,11 +101,11 @@ Partial Class Form1
         'Num_Start_Num
         '
         Me.Num_Start_Num.Location = New System.Drawing.Point(13, 95)
-        Me.Num_Start_Num.Maximum = New Decimal(New Integer() {65535, 0, 0, 0})
+        Me.Num_Start_Num.Maximum = New Decimal(New Integer() {65536, 0, 0, 0})
         Me.Num_Start_Num.Name = "Num_Start_Num"
         Me.Num_Start_Num.Size = New System.Drawing.Size(83, 20)
         Me.Num_Start_Num.TabIndex = 6
-        Me.Num_Start_Num.Value = New Decimal(New Integer() {13734, 0, 0, 0})
+        Me.Num_Start_Num.Value = New Decimal(New Integer() {51712, 0, 0, 0})
         '
         'Label3
         '
@@ -172,11 +173,21 @@ Partial Class Form1
         Me.OpenPACHDialog.FileName = "0001.pach"
         Me.OpenPACHDialog.Filter = "Pach File|*.pac;*.pach;*.dat|All Files|*.*"
         '
+        'Button3
+        '
+        Me.Button3.Location = New System.Drawing.Point(183, 12)
+        Me.Button3.Name = "Button3"
+        Me.Button3.Size = New System.Drawing.Size(75, 23)
+        Me.Button3.TabIndex = 15
+        Me.Button3.Text = "Add String"
+        Me.Button3.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(208, 181)
+        Me.ClientSize = New System.Drawing.Size(269, 178)
+        Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.TextBox2)
         Me.Controls.Add(Me.Button1)
@@ -217,4 +228,5 @@ Partial Class Form1
     Friend WithEvents Label5 As Label
     Friend WithEvents SaveCSVDialog As SaveFileDialog
     Friend WithEvents OpenPACHDialog As OpenFileDialog
+    Friend WithEvents Button3 As Button
 End Class

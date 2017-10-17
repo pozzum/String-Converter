@@ -3,6 +3,9 @@ Imports System.IO
 Imports System.IO.Stream
 Imports Microsoft.VisualBasic
 Imports Microsoft.VisualBasic.FileIO
+Imports System.ComponentModel 'Backgroundworker
+Imports System.Environment 'appdata
+Imports System.Text.RegularExpressions 'match collections
 Public Class Form1
     Dim counter As Integer = 0
 
@@ -28,14 +31,15 @@ Public Class Form1
                 Dim StringName(3) As Byte
                 Dim StartString As Int32 = Num_Start_Num.Value ' 35A6 first new string to be 35A7
                 StringName = BitConverter.GetBytes(StartString)
-                'we need the total string count for the start
-                Dim Stringcount(3) As Byte
+
                 'we need the first strings location - string length
                 NewStart = BitConverter.GetBytes(8 + NewStringCount * 12 - stringsize)
                 'now to build the file
                 For i As Integer = 0 To 3
                     newdataset(i) = 0
                 Next
+                'we need the total string count for the start
+                Dim Stringcount(3) As Byte
                 Stringcount = BitConverter.GetBytes(NewStringCount)
                 newdataset(4) = Stringcount(0)
                 newdataset(5) = Stringcount(1)
@@ -157,6 +161,104 @@ Public Class Form1
                 Next
                 CSV_Writer.Close()
                 MessageBox.Show("Writing Complete")
+            End If
+        End If
+    End Sub
+
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+
+        If OpenPACHDialog.ShowDialog = System.Windows.Forms.DialogResult.OK Then
+            If OpenCSVDialog.ShowDialog = System.Windows.Forms.DialogResult.OK Then
+                If SavePACHDialog.ShowDialog = System.Windows.Forms.DialogResult.OK Then
+                    Dim SourceStringFiles As Byte() = File.ReadAllBytes(OpenPACHDialog.FileName)
+                    Dim String_Count As Integer = BitConverter.ToInt32(SourceStringFiles, 4)
+                    MessageBox.Show(String_Count)
+                    Dim Max_Length As Integer = 0
+                    Dim String_List(String_Count - 1) As String
+                    Dim Ref_Num(String_Count - 1) As Integer
+                    Dim Start_Num(String_Count - 1) As Integer
+                    Dim Length(String_Count - 1) As Integer
+                    For i As Integer = 0 To String_Count - 1
+                        Start_Num(i) = BitConverter.ToInt32(SourceStringFiles, &H8 + 12 * i)
+                        Length(i) = BitConverter.ToInt32(SourceStringFiles, &HC + 12 * i)
+                        Ref_Num(i) = BitConverter.ToInt32(SourceStringFiles, &H10 + 12 * i)
+                        If Length(i) > Max_Length Then
+                            Max_Length = Length(i)
+                        End If
+                        String_List(i) = System.Text.Encoding.ASCII.GetString(SourceStringFiles, Start_Num(i), Length(i)).TrimEnd(Chr(0))
+                        Start_Num(i) = Start_Num(i) + Num_String_Count.Value * 12
+                    Next
+                    Dim NewStringFile As Byte() = New Byte(SourceStringFiles.Count + 12 * Num_String_Count.Value + Num_String_Count.Value * Num_Max_Length.Value - 1) {}
+                    'we need the total string count for the start
+                    Dim Stringcount As Byte()
+                    Stringcount = BitConverter.GetBytes(CInt(String_Count + Num_String_Count.Value))
+                    Buffer.BlockCopy(Stringcount, 0, NewStringFile, 4, 4)
+                    For i As Integer = 0 To String_Count - 1
+                        Dim TempArray As Byte() = BitConverter.GetBytes(Start_Num(i))
+                        Buffer.BlockCopy(TempArray, 0, NewStringFile, &H8 + 12 * i, 4)
+                        TempArray = BitConverter.GetBytes(Length(i))
+                        Buffer.BlockCopy(TempArray, 0, NewStringFile, &HC + 12 * i, 4)
+                        TempArray = BitConverter.GetBytes(Ref_Num(i))
+                        Buffer.BlockCopy(TempArray, 0, NewStringFile, &H10 + 12 * i, 4)
+                    Next
+                    File.WriteAllBytes(SavePACHDialog.FileName, NewStringFile)
+                    MessageBox.Show("Exist Header Saved")
+                    Dim BaseLine As Integer = Start_Num(String_Count - 1) + Length(String_Count - 1)
+                    For i As Integer = 0 To Num_String_Count.Value - 1
+                        'starting Number first
+                        Dim TempArray As Byte() = BitConverter.GetBytes(CInt(BaseLine + i * Num_Max_Length.Value))
+                        Buffer.BlockCopy(TempArray, 0, NewStringFile, String_Count * 12 + &H8 + 12 * i, 4)
+                        'then length
+                        TempArray = BitConverter.GetBytes(CInt(Num_Max_Length.Value))
+                        Buffer.BlockCopy(TempArray, 0, NewStringFile, String_Count * 12 + &HC + 12 * i, 4)
+                        'then referece number
+                        TempArray = BitConverter.GetBytes(CInt(Num_Start_Num.Value + i))
+                        Buffer.BlockCopy(TempArray, 0, NewStringFile, String_Count * 12 + &H10 + 12 * i, 4)
+                    Next
+                    File.WriteAllBytes(SavePACHDialog.FileName, NewStringFile)
+                    MessageBox.Show("New Header Saved")
+                    MessageBox.Show(Hex(Start_Num(0)))
+                    Buffer.BlockCopy(SourceStringFiles, Start_Num(0) - Num_String_Count.Value * 12, NewStringFile, 8 + String_Count * 12 + Num_String_Count.Value * 12, SourceStringFiles.Count - Start_Num(0) - 1)
+                    File.WriteAllBytes(SavePACHDialog.FileName, NewStringFile)
+                    MessageBox.Show("Exist Strings Saved")
+
+                    Dim TextArray() As String
+                    Using MyReader As New Microsoft.VisualBasic.FileIO.TextFieldParser(OpenCSVDialog.FileName)
+                        MyReader.TextFieldType = Microsoft.VisualBasic.FileIO.FieldType.Delimited
+                        MyReader.SetDelimiters({vbTab, ","})
+                        Dim counter As Integer = 0
+                        Do While Not MyReader.EndOfData
+                            Try
+                                TextArray = MyReader.ReadFields
+                                Dim bytearray() As Byte
+                                'MessageBox.Show(TextArray.Length)
+                                Try
+                                    bytearray = System.Text.Encoding.ASCII.GetBytes(TextArray(0))
+                                Catch ex As Exception
+                                    MessageBox.Show(ex.Message & counter & TextArray(0)) '& TextArray(i) 
+                                End Try
+                                For j As Integer = 0 To 29
+                                    Try
+                                        If j < bytearray.Length Then
+                                            NewStringFile(BaseLine + counter * 30 + j) = bytearray(j)
+                                        End If
+                                    Catch ex As Exception
+                                        MessageBox.Show("Error: " & counter & " " & TextArray(0) & " " & j & " " & Mid(TextArray(0), j - 1, j))
+                                    End Try
+                                Next
+                            Catch ex As FileIO.MalformedLineException
+                                Stop
+                            End Try
+                            counter = counter + 1
+                        Loop
+                    End Using
+                    Try
+                        File.WriteAllBytes(SavePACHDialog.FileName, NewStringFile)
+                    Catch ex As Exception
+                        'MessageBox.Show(ex.Message)
+                    End Try
+                    MessageBox.Show("String Built")
+                End If
             End If
         End If
     End Sub
