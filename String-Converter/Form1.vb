@@ -172,7 +172,6 @@ Public Class Form1
                 If SavePACHDialog.ShowDialog = System.Windows.Forms.DialogResult.OK Then
                     Dim SourceStringFiles As Byte() = File.ReadAllBytes(OpenPACHDialog.FileName)
                     Dim String_Count As Integer = BitConverter.ToInt32(SourceStringFiles, 4)
-                    MessageBox.Show(String_Count)
                     Dim Max_Length As Integer = 0
                     Dim String_List(String_Count - 1) As String
                     Dim Ref_Num(String_Count - 1) As Integer
@@ -201,8 +200,6 @@ Public Class Form1
                         TempArray = BitConverter.GetBytes(Ref_Num(i))
                         Buffer.BlockCopy(TempArray, 0, NewStringFile, &H10 + 12 * i, 4)
                     Next
-                    File.WriteAllBytes(SavePACHDialog.FileName, NewStringFile)
-                    MessageBox.Show("Exist Header Saved")
                     Dim BaseLine As Integer = Start_Num(String_Count - 1) + Length(String_Count - 1)
                     For i As Integer = 0 To Num_String_Count.Value - 1
                         'starting Number first
@@ -215,13 +212,7 @@ Public Class Form1
                         TempArray = BitConverter.GetBytes(CInt(Num_Start_Num.Value + i))
                         Buffer.BlockCopy(TempArray, 0, NewStringFile, String_Count * 12 + &H10 + 12 * i, 4)
                     Next
-                    File.WriteAllBytes(SavePACHDialog.FileName, NewStringFile)
-                    MessageBox.Show("New Header Saved")
-                    MessageBox.Show(Hex(Start_Num(0)))
-                    Buffer.BlockCopy(SourceStringFiles, Start_Num(0) - Num_String_Count.Value * 12, NewStringFile, 8 + String_Count * 12 + Num_String_Count.Value * 12, SourceStringFiles.Count - Start_Num(0) - 1)
-                    File.WriteAllBytes(SavePACHDialog.FileName, NewStringFile)
-                    MessageBox.Show("Exist Strings Saved")
-
+                    Buffer.BlockCopy(SourceStringFiles, Start_Num(0) - Num_String_Count.Value * 12, NewStringFile, 8 + String_Count * 12 + Num_String_Count.Value * 12, SourceStringFiles.Count - Start_Num(0) - 1 + Num_String_Count.Value * 12)
                     Dim TextArray() As String
                     Using MyReader As New Microsoft.VisualBasic.FileIO.TextFieldParser(OpenCSVDialog.FileName)
                         MyReader.TextFieldType = Microsoft.VisualBasic.FileIO.FieldType.Delimited
