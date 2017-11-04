@@ -8,6 +8,7 @@ Imports System.Environment 'appdata
 Imports System.Text.RegularExpressions 'match collections
 Public Class Form1
     Dim counter As Integer = 0
+    Public SentFile As String = ""
 
     Function Bytes2Dec(array() As Byte)
         Dim Number As Int32 = array(3) * 256 * 256 * 256 + array(2) * 256 * 256 + array(1) * 256 + array(0)
@@ -200,6 +201,8 @@ Public Class Form1
                         TempArray = BitConverter.GetBytes(Ref_Num(i))
                         Buffer.BlockCopy(TempArray, 0, NewStringFile, &H10 + 12 * i, 4)
                     Next
+                    'File.WriteAllBytes(SavePACHDialog.FileName, NewStringFile)
+                    'MessageBox.Show("Starting Header Built")
                     Dim BaseLine As Integer = Start_Num(String_Count - 1) + Length(String_Count - 1)
                     For i As Integer = 0 To Num_String_Count.Value - 1
                         'starting Number first
@@ -252,5 +255,14 @@ Public Class Form1
                 End If
             End If
         End If
+    End Sub
+
+    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+        If OpenPACHDialog.ShowDialog = System.Windows.Forms.DialogResult.OK Then
+            SentFile = OpenPACHDialog.FileName
+            Form2.ShowDialog()
+            SentFile = ""
+        End If
+
     End Sub
 End Class

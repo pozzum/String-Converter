@@ -39,6 +39,7 @@ Partial Class Form1
         Me.SaveCSVDialog = New System.Windows.Forms.SaveFileDialog()
         Me.OpenPACHDialog = New System.Windows.Forms.OpenFileDialog()
         Me.Button3 = New System.Windows.Forms.Button()
+        Me.Button4 = New System.Windows.Forms.Button()
         CType(Me.Num_String_Count, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Num_Max_Length, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.Num_Start_Num, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -182,11 +183,21 @@ Partial Class Form1
         Me.Button3.Text = "Add String"
         Me.Button3.UseVisualStyleBackColor = True
         '
+        'Button4
+        '
+        Me.Button4.Location = New System.Drawing.Point(183, 39)
+        Me.Button4.Name = "Button4"
+        Me.Button4.Size = New System.Drawing.Size(75, 23)
+        Me.Button4.TabIndex = 16
+        Me.Button4.Text = "Editor"
+        Me.Button4.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(269, 178)
+        Me.Controls.Add(Me.Button4)
         Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.Label5)
         Me.Controls.Add(Me.TextBox2)
@@ -229,4 +240,5 @@ Partial Class Form1
     Friend WithEvents SaveCSVDialog As SaveFileDialog
     Friend WithEvents OpenPACHDialog As OpenFileDialog
     Friend WithEvents Button3 As Button
+    Friend WithEvents Button4 As Button
 End Class
