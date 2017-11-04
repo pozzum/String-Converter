@@ -16,6 +16,7 @@ Public Class Form2
         TextBoxActiveFile.Text = Form1.SentFile
         ProcessString(True)
         ReadMainReference()
+        ReadSecondReference()
     End Sub
     Sub ProcessString(Optional Backup As Boolean = False)
         'Creating Origional Backup
@@ -62,6 +63,7 @@ Public Class Form2
             LabelLength.Text = CurrentLength & "\" & MaxReadableLength & " Bytes"
             If ReferenceByHeader(0) <> 0 AndAlso NumericMain.Value = 0 Then
                 NumericMain.Value = ReferenceByHeader(0)
+                NumericSecondary.Value = ReferenceByHeader(0)
             End If
         End If
     End Sub
@@ -141,7 +143,6 @@ Public Class Form2
             NumericMain.Value = CurrentIndexMain
         End If
     End Sub
-
     Private Sub NumericSecondary_ValueChanged(sender As Object, e As EventArgs) Handles NumericSecondary.ValueChanged
         If ButtonAdd.Text = "Save" Then
             Dim Tempnumber As Integer = NumericSecondary.Value
@@ -174,30 +175,82 @@ Public Class Form2
             Else
                 NumericSecondary.Value = CurrentIndexSecondary
             End If
+        Else
+            ReadSecondReference()
+        End If
+    End Sub
+    Sub ReadSecondReference()
+        Dim Tempnumber As Integer = NumericSecondary.Value
+        If ReferenceByHeader.Contains(NumericSecondary.Value) Then
+            TextBoxSecondary.Text = StringByReference(NumericSecondary.Value)
+            CurrentIndexSecondary = NumericSecondary.Value
+        ElseIf NumericSecondary.Value > CurrentIndexSecondary Then
+            While Tempnumber < 1000001
+                If ReferenceByHeader.Contains(Tempnumber) Then
+                    Exit While
+                End If
+                Tempnumber = Tempnumber + 1
+            End While
+            If Tempnumber = 1000001 Then
+                NumericSecondary.Value = CurrentIndexSecondary
+            Else
+                NumericSecondary.Value = Tempnumber
+            End If
+        ElseIf NumericSecondary.Value < CurrentIndexSecondary Then
+            While Tempnumber > -1
+                If ReferenceByHeader.Contains(Tempnumber) Then
+                    Exit While
+                End If
+                Tempnumber = Tempnumber - 1
+            End While
+            If Tempnumber = -1 Then
+                NumericSecondary.Value = CurrentIndexSecondary
+            Else
+                NumericSecondary.Value = Tempnumber
+            End If
+        Else
+            NumericSecondary.Value = CurrentIndexSecondary
         End If
     End Sub
     Private Sub ButtonDelete_Click(sender As Object, e As EventArgs) Handles ButtonDelete.Click
-        'MessageBox.Show(NumericMain.Value)
-        Dim DeletedIndex As Integer = Array.IndexOf(ReferenceByHeader, CInt(NumericMain.Value))
-        'MessageBox.Show(DeletedIndex)
-        Dim TempIndex As Integer = DeletedIndex + 1
-        'MessageBox.Show("Removing Text Bytes")
-        'Removing Text Bytes For All Later Arrays
-        While TempIndex < OffsetByHeader.Length
-            Try
-                OffsetByHeader(TempIndex) = OffsetByHeader(TempIndex) - LengthByHeader(DeletedIndex)
-                TempIndex = TempIndex + 1
-            Catch ex As Exception
-                MessageBox.Show(TempIndex & vbNewLine &
+        If ButtonDelete.Text = "Delete" Then
+            'MessageBox.Show(NumericMain.Value)
+            Dim DeletedIndex As Integer = Array.IndexOf(ReferenceByHeader, CInt(NumericMain.Value))
+            'MessageBox.Show(DeletedIndex)
+            Dim TempIndex As Integer = DeletedIndex + 1
+            'MessageBox.Show("Removing Text Bytes")
+            'Removing Text Bytes For All Later Arrays
+            While TempIndex < OffsetByHeader.Length
+                Try
+                    OffsetByHeader(TempIndex) = OffsetByHeader(TempIndex) - LengthByHeader(DeletedIndex)
+                    TempIndex = TempIndex + 1
+                Catch ex As Exception
+                    MessageBox.Show(TempIndex & vbNewLine &
                                 ex.Message)
-            End Try
-        End While
-        'MessageBox.Show("Removing Header Bytes")
-        'Removing the 12 header bytes from all
-        For i As Integer = 0 To OffsetByHeader.Length - 1
-            OffsetByHeader(i) = OffsetByHeader(i) - 12
-        Next
-        RebuildFile(DeletedIndex)
+                End Try
+            End While
+            'MessageBox.Show("Removing Header Bytes")
+            'Removing the 12 header bytes from all
+            For i As Integer = 0 To OffsetByHeader.Length - 1
+                OffsetByHeader(i) = OffsetByHeader(i) - 12
+            Next
+            RebuildFile(DeletedIndex)
+        Else 'Text says cancel
+            NumericMain.ReadOnly = False
+            NumericMain.Enabled = True
+            TextBoxMain.ReadOnly = True
+            NumericSecondary.ReadOnly = True
+            NumericSecondary.Enabled = False
+            TextBoxSecondary.ReadOnly = True
+            ButtonEdit.Show()
+            ButtonAdd.Show()
+            ButtonMerge.Show()
+            OldText = ""
+            ButtonDelete.Text = "Delete"
+            ButtonEdit.Text = "Edit"
+            ButtonAdd.Text = "Add"
+            ButtonMerge.Text = "Merge"
+        End If
     End Sub
     Dim OldText As String = ""
     Private Sub ButtonEdit_Click(sender As Object, e As EventArgs) Handles ButtonEdit.Click
@@ -205,8 +258,7 @@ Public Class Form2
             NumericMain.ReadOnly = True
             NumericMain.Enabled = False
             TextBoxMain.ReadOnly = False
-            TextBoxMain.Enabled = True
-            ButtonDelete.Hide()
+            ButtonDelete.Text = "Cancel"
             ButtonAdd.Hide()
             ButtonMerge.Hide()
             OldText = TextBoxMain.Text
@@ -221,6 +273,7 @@ Public Class Form2
             Dim NewTextBytes As Byte() = New Byte(LengthByHeader(EditedIndex)) {}
             Buffer.BlockCopy(System.Text.Encoding.ASCII.GetBytes(TextBoxMain.Text), 0, NewTextBytes, 0, LengthByHeader(EditedIndex) - 1)
             BytesByHeader(EditedIndex) = NewTextBytes
+            'Adjusting the offsets for the changed difference
             Dim TempIndex As Integer = EditedIndex + 1
             While TempIndex < OffsetByHeader.Length
                 Try
@@ -237,8 +290,7 @@ Public Class Form2
             NumericMain.ReadOnly = False
             NumericMain.Enabled = True
             TextBoxMain.ReadOnly = True
-            TextBoxMain.Enabled = False
-            ButtonDelete.Show()
+            ButtonDelete.Text = "Delete"
             ButtonAdd.Show()
             ButtonMerge.Show()
             OldText = ""
@@ -252,8 +304,7 @@ Public Class Form2
             NumericSecondary.ReadOnly = False
             NumericSecondary.Enabled = True
             TextBoxSecondary.ReadOnly = False
-            TextBoxSecondary.Enabled = True
-            ButtonDelete.Hide()
+            ButtonDelete.Text = "Cancel"
             ButtonEdit.Hide()
             ButtonMerge.Hide()
             ButtonAdd.Text = "Save"
@@ -275,8 +326,7 @@ Public Class Form2
                     NumericSecondary.ReadOnly = True
                     NumericSecondary.Enabled = False
                     TextBoxSecondary.ReadOnly = True
-                    TextBoxSecondary.Enabled = False
-                    ButtonDelete.Show()
+                    ButtonDelete.Text = "Delete"
                     ButtonEdit.Show()
                     ButtonMerge.Show()
                     ButtonAdd.Text = "Add"
@@ -306,13 +356,79 @@ Public Class Form2
             NumericSecondary.ReadOnly = True
             NumericSecondary.Enabled = False
             TextBoxSecondary.ReadOnly = True
-            TextBoxSecondary.Enabled = False
-            ButtonDelete.Show()
+            ButtonDelete.Text = "Delete"
             ButtonEdit.Show()
             ButtonMerge.Show()
             ButtonAdd.Text = "Add"
         End If
     End Sub
-
+    Private Sub ButtonMerge_Click(sender As Object, e As EventArgs) Handles ButtonMerge.Click
+        If ButtonMerge.Text = "Merge" Then
+            NumericMain.ReadOnly = True
+            NumericMain.Enabled = False
+            NumericSecondary.ReadOnly = False
+            NumericSecondary.Enabled = True
+            ButtonDelete.Text = "Cancel"
+            ButtonEdit.Hide()
+            ButtonAdd.Hide()
+            ButtonMerge.Text = "Save"
+            If ReferenceByHeader(0) <> 0 AndAlso NumericSecondary.Value = 0 Then
+                NumericMain.Value = ReferenceByHeader(0)
+            End If
+        Else ' if ButtonEdit.Text = "Save" then
+            Dim RemainingIndex As Integer = Array.IndexOf(ReferenceByHeader, CInt(NumericMain.Value))
+            Dim RemovedIndex As Integer = Array.IndexOf(ReferenceByHeader, CInt(NumericSecondary.Value))
+            Dim RemovedLength As Integer = LengthByHeader(RemovedIndex)
+            If (LengthByHeader(RemainingIndex) = LengthByHeader(RemovedIndex)) = False Then
+                Dim result = MessageBox.Show("String lengths do not match!" & vbNewLine &
+                                "First string length: " & LengthByHeader(RemainingIndex) & vbNewLine &
+                                "Second string length: " & LengthByHeader(RemovedIndex) & vbNewLine &
+                                "Continue?", "Length mismatch.", MessageBoxButtons.YesNoCancel)
+                If result = DialogResult.Yes Then
+                    LengthByHeader(RemovedIndex) = LengthByHeader(RemainingIndex)
+                ElseIf result = DialogResult.Cancel Then
+                    'Reset Menu
+                    NumericMain.ReadOnly = False
+                    NumericMain.Enabled = True
+                    NumericSecondary.ReadOnly = True
+                    NumericSecondary.Enabled = False
+                    ButtonDelete.Text = "Delete"
+                    ButtonEdit.Show()
+                    ButtonAdd.Show()
+                    ButtonMerge.Text = "Merge"
+                    Exit Sub
+                Else 'no click
+                    Exit Sub
+                End If
+            End If
+            'Make File Changes
+            'Making the new offsets merge
+            OffsetByHeader(RemovedIndex) = OffsetByHeader(RemainingIndex)
+            BytesByHeader(RemovedIndex) = BytesByHeader(RemainingIndex)
+            TextBoxSecondary.Text = TextBoxMain.Text
+            'Adjusting the offsets for the removed string
+            Dim TempIndex As Integer = RemovedIndex + 1
+            While TempIndex < OffsetByHeader.Length
+                Try
+                    OffsetByHeader(TempIndex) = OffsetByHeader(TempIndex) - RemovedLength
+                    TempIndex = TempIndex + 1
+                Catch ex As Exception
+                    MessageBox.Show(TempIndex & vbNewLine &
+                                ex.Message)
+                End Try
+            End While
+            'Rebuild The File
+            RebuildFile()
+            'Reset Menu
+            NumericMain.ReadOnly = False
+            NumericMain.Enabled = True
+            NumericSecondary.ReadOnly = True
+            NumericSecondary.Enabled = False
+            ButtonDelete.Text = "Delete"
+            ButtonEdit.Show()
+            ButtonAdd.Show()
+            ButtonMerge.Text = "Merge"
+        End If
+    End Sub
 #End Region
 End Class
