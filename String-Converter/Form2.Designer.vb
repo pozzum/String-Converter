@@ -65,6 +65,7 @@ Partial Class Form2
         '
         'TextBoxMain
         '
+        Me.TextBoxMain.Enabled = False
         Me.TextBoxMain.Location = New System.Drawing.Point(12, 64)
         Me.TextBoxMain.Name = "TextBoxMain"
         Me.TextBoxMain.ReadOnly = True
