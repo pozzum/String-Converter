@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class Form2
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class Form2
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.TextBoxActiveFile = New System.Windows.Forms.TextBox()
         Me.Label1 = New System.Windows.Forms.Label()
@@ -32,7 +32,6 @@ Partial Class Form2
         Me.ButtonMerge = New System.Windows.Forms.Button()
         Me.NumericSecondary = New System.Windows.Forms.NumericUpDown()
         Me.TextBoxSecondary = New System.Windows.Forms.TextBox()
-        Me.LabelLength = New System.Windows.Forms.Label()
         CType(Me.NumericMain, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.NumericSecondary, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -129,21 +128,11 @@ Partial Class Form2
         Me.TextBoxSecondary.Size = New System.Drawing.Size(156, 80)
         Me.TextBoxSecondary.TabIndex = 9
         '
-        'LabelLength
-        '
-        Me.LabelLength.AutoSize = True
-        Me.LabelLength.Location = New System.Drawing.Point(9, 316)
-        Me.LabelLength.Name = "LabelLength"
-        Me.LabelLength.Size = New System.Drawing.Size(113, 13)
-        Me.LabelLength.TabIndex = 10
-        Me.LabelLength.Text = "805194/805194 Bytes"
-        '
         'Form2
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(180, 338)
-        Me.Controls.Add(Me.LabelLength)
+        Me.ClientSize = New System.Drawing.Size(180, 321)
         Me.Controls.Add(Me.TextBoxSecondary)
         Me.Controls.Add(Me.NumericSecondary)
         Me.Controls.Add(Me.ButtonMerge)
@@ -176,5 +165,4 @@ Partial Class Form2
     Friend WithEvents ButtonMerge As Button
     Friend WithEvents NumericSecondary As NumericUpDown
     Friend WithEvents TextBoxSecondary As TextBox
-    Friend WithEvents LabelLength As Label
 End Class

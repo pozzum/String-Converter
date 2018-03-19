@@ -6,7 +6,7 @@ Public Class Form2
     Dim ReferenceByHeader As Integer()
     Dim BytesByHeader(1000000)() As Byte
     Dim StringByReference As String()
-    Const MaxReadableLength = 805194 '804876
+    'Const MaxReadableLength = 805194 '804876
     Dim CurrentIndexMain = 0
     Dim CurrentIndexSecondary = 0
     Dim CurrentLength = 0
@@ -60,7 +60,7 @@ Public Class Form2
             'MessageBox.Show(Hex(OffsetByHeader(StringCount - 1)))
             'MessageBox.Show(Hex(LengthByHeader(StringCount - 1)))
             CurrentLength = OffsetByHeader(StringCount - 1) + LengthByHeader(StringCount - 1)
-            LabelLength.Text = CurrentLength & "\" & MaxReadableLength & " Bytes"
+            'LabelLength.Text = CurrentLength & "\" & MaxReadableLength & " Bytes"
             If ReferenceByHeader(0) <> 0 AndAlso NumericMain.Value = 0 Then
                 NumericMain.Value = ReferenceByHeader(0)
                 NumericSecondary.Value = ReferenceByHeader(0)
@@ -69,7 +69,7 @@ Public Class Form2
     End Sub
     Sub RebuildFile(Optional deletedindex As Integer = 1000000)
         'Moving Removed Index To Back And Removing
-        Dim TempArray() As Byte = New Byte(MaxReadableLength - 1) {}
+        Dim TempArray() As Byte '= New Byte(MaxReadableLength - 1) {}
         'MessageBox.Show("Copy New String Count")
         'Copying Over The New String Count
         If deletedindex <> 1000000 Then
@@ -327,23 +327,23 @@ Public Class Form2
             End If
         Else ' if ButtonEdit.Text = "Save" then
             'Check if new string would pass max length
-            If (CurrentLength + 12 + TextBoxSecondary.Text.Length + 1) > MaxReadableLength Then
-                Dim result As Integer = MessageBox.Show("New string will not fit!", "To exit add hit cancel.", MessageBoxButtons.OKCancel)
-                If result = DialogResult.OK Then
-                    Exit Sub
-                Else ' cancel
-                    NumericMain.ReadOnly = False
-                    NumericMain.Enabled = True
-                    NumericSecondary.ReadOnly = True
-                    NumericSecondary.Enabled = False
-                    TextBoxSecondary.ReadOnly = True
-                    ButtonDelete.Text = "Delete"
-                    ButtonEdit.Show()
-                    ButtonMerge.Show()
-                    ButtonAdd.Text = "Add"
-                    Exit Sub
-                End If
-            End If
+            'If (CurrentLength + 12 + TextBoxSecondary.Text.Length + 1) > MaxReadableLength Then
+            'Dim result As Integer = MessageBox.Show("New string will not fit!", "To exit add hit cancel.", MessageBoxButtons.OKCancel)
+            'If result = DialogResult.OK Then
+            'Exit Sub
+            'Else ' cancel
+            NumericMain.ReadOnly = False
+            NumericMain.Enabled = True
+            NumericSecondary.ReadOnly = True
+            NumericSecondary.Enabled = False
+            TextBoxSecondary.ReadOnly = True
+            ButtonDelete.Text = "Delete"
+            ButtonEdit.Show()
+            ButtonMerge.Show()
+            ButtonAdd.Text = "Add"
+            Exit Sub
+            'End If
+            'End If
             ' New String Fits
             'Adding the new string
             Dim OldOffsetByHeader As Integer() = OffsetByHeader
