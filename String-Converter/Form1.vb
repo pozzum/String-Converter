@@ -166,7 +166,8 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+
+    Private Sub Button3_Click(sender As Object, e As EventArgs) 'Handles Button3.Click
 
         If OpenPACHDialog.ShowDialog = System.Windows.Forms.DialogResult.OK Then
             If OpenCSVDialog.ShowDialog = System.Windows.Forms.DialogResult.OK Then
@@ -231,10 +232,10 @@ Public Class Form1
                                 Catch ex As Exception
                                     MessageBox.Show(ex.Message & counter & TextArray(0)) '& TextArray(i) 
                                 End Try
-                                For j As Integer = 0 To 29
+                                For j As Integer = 0 To Num_Max_Length.Value - 1
                                     Try
                                         If j < bytearray.Length Then
-                                            NewStringFile(BaseLine + counter * 30 + j) = bytearray(j)
+                                            NewStringFile(BaseLine + counter * Num_Max_Length.Value + j) = bytearray(j)
                                         End If
                                     Catch ex As Exception
                                         MessageBox.Show("Error: " & counter & " " & TextArray(0) & " " & j & " " & Mid(TextArray(0), j - 1, j))
@@ -265,4 +266,192 @@ Public Class Form1
         End If
 
     End Sub
+#Region "Rebuilding the adding strings button"
+    '----------------------------------
+    'Trying to rebuild
+    '----------------------------------
+    Private Sub Add_Strings_Button(sender As Object, e As EventArgs) Handles Button3.Click
+        If OpenPACHDialog.ShowDialog = System.Windows.Forms.DialogResult.OK Then
+            If OpenCSVDialog.ShowDialog = System.Windows.Forms.DialogResult.OK Then
+                If SavePACHDialog.ShowDialog = System.Windows.Forms.DialogResult.OK Then
+                    AddStrings(OpenPACHDialog.FileName, OpenCSVDialog.FileName, SavePACHDialog.FileName)
+                End If
+            End If
+        End If
+    End Sub
+
+    Dim OffsetByHeader As Integer()
+    Dim LengthByHeader As Integer()
+    Dim ReferenceByHeader As Integer()
+    Dim BytesByHeader(1000000)() As Byte
+    Dim StringByReference As String()
+    Dim CurrentIndexMain = 0
+    Dim CurrentIndexSecondary = 0
+    Dim CurrentLength = 0
+
+    Sub AddStrings(Sent_File As String, Sent_CSV As String, Saved_String As String)
+        'Reading Full File
+        Dim FileBytes() As Byte = File.ReadAllBytes(Sent_File)
+        'Making Sure File is Uncompressed
+        If (BitConverter.ToInt32(FileBytes, 0) = 0) = False Then
+            MessageBox.Show("File Must Be Uncompressed!", "Oh No")
+            Me.Close()
+        Else
+            'Getting the Header String Count
+            Dim StringCount As Integer = BitConverter.ToInt32(FileBytes, 4)
+            'Get Data On the Pach parts
+            ReDim OffsetByHeader(StringCount - 1)
+            ReDim LengthByHeader(StringCount - 1)
+            ReDim ReferenceByHeader(StringCount - 1)
+            StringByReference = New String(1000000) {}
+            For i As Integer = 0 To StringCount - 1
+                OffsetByHeader(i) = BitConverter.ToInt32(FileBytes, 8 + i * 12 + 0)
+                LengthByHeader(i) = BitConverter.ToInt32(FileBytes, 8 + i * 12 + 4)
+                ReferenceByHeader(i) = BitConverter.ToInt32(FileBytes, 8 + i * 12 + 8)
+                'Trim all 00 chars so the strings don't end abrubtly in future manipulation
+                BytesByHeader(i) = New Byte(LengthByHeader(i) - 1) {}
+                Array.Copy(FileBytes, OffsetByHeader(i), BytesByHeader(i), 0, LengthByHeader(i))
+                StringByReference(ReferenceByHeader(i)) = System.Text.Encoding.ASCII.GetString(BytesByHeader(i),
+                                                         0,
+                                                         BytesByHeader(i).Length).TrimEnd(Chr(0))
+            Next
+            CurrentLength = OffsetByHeader(StringCount - 1) + LengthByHeader(StringCount - 1)
+            '------------------------------------------------
+            'Copying old code to add from CSV
+            '------------------------------------------------
+            Dim NewStringFile As Byte() = New Byte(FileBytes.Count + 12 * Num_String_Count.Value + Num_String_Count.Value * Num_Max_Length.Value - 1) {}
+            'we need the total string count for the start
+            Dim String_count_array As Byte()
+            String_count_array = BitConverter.GetBytes(CInt(StringCount + Num_String_Count.Value))
+            Buffer.BlockCopy(String_count_array, 0, NewStringFile, 4, 4)
+            Dim Base_String_Location As Integer = 0
+
+            'This adds all of the old strings back to the file header prior to saving these need to be adjusted with the if elseif checks
+            For i As Integer = 0 To StringCount - 1
+                If ReferenceByHeader(i) < Num_Start_Num.Value Then
+                    Dim TempArray As Byte() = New Byte() {}
+                    TempArray = BitConverter.GetBytes(CInt(OffsetByHeader(i) + (Num_String_Count.Value * 12)))
+                    'MessageBox.Show(Hex(OffsetByHeader(i) + (Num_String_Count.Value * 12)))
+                    Buffer.BlockCopy(TempArray, 0, NewStringFile, &H8 + 12 * i, 4)
+                    TempArray = New Byte() {}
+                    TempArray = BitConverter.GetBytes(LengthByHeader(i))
+                    Buffer.BlockCopy(TempArray, 0, NewStringFile, &HC + 12 * i, 4)
+                    TempArray = New Byte() {}
+                    TempArray = BitConverter.GetBytes(ReferenceByHeader(i))
+                    Buffer.BlockCopy(TempArray, 0, NewStringFile, &H10 + 12 * i, 4)
+                    'Have to add the string in
+                    Buffer.BlockCopy(BytesByHeader(i), 0, NewStringFile, OffsetByHeader(i) +
+                                     (Num_String_Count.Value * 12),
+                                     BytesByHeader(i).Length)
+                ElseIf ReferenceByHeader(i) < Num_Start_Num.Value + Num_String_Count.Value Then
+                    If Base_String_Location = 0 Then
+                        Base_String_Location = i
+                    End If
+                    If MessageBox.Show("New strings will overwrite an existing string" & vbNewLine &
+                                    Hex(ReferenceByHeader(i)) & vbNewLine &
+                                    StringByReference(ReferenceByHeader(i)) & vbNewLine &
+                                    "Continue?", "Overwrite strings?", MessageBoxButtons.YesNo) = DialogResult.No Then
+                        Exit Sub
+                    End If
+                Else ' ReferenceByHeader(i) > ReferenceByHeader(i) < Num_Start_Num.Value + Num_String_Count.Value 
+                    If Base_String_Location = 0 Then
+                        Base_String_Location = i
+                    End If
+                    Dim TempArray As Byte() = New Byte() {}
+                    TempArray = BitConverter.GetBytes(CInt(OffsetByHeader(i) +
+                                                                    (Num_String_Count.Value * 12) +
+                                                                    (Num_String_Count.Value * Num_Max_Length.Value)))
+                    'MessageBox.Show(Hex(OffsetByHeader(i) + (Num_String_Count.Value * 12) + (Num_String_Count.Value * Num_Max_Length.Value)))
+                    'MessageBox.Show(Hex(TempArray(0)) & " " & Hex(TempArray(1)) & " " & Hex(TempArray(2)) & " " & Hex(TempArray(3)))
+                    Buffer.BlockCopy(TempArray, 0, NewStringFile, &H8 + 12 * i +
+                                     (Num_String_Count.Value * 12), 4)
+                    TempArray = New Byte() {}
+                    TempArray = BitConverter.GetBytes(LengthByHeader(i))
+                    Buffer.BlockCopy(TempArray, 0, NewStringFile, &HC + 12 * i +
+                                     (Num_String_Count.Value * 12), 4)
+                    TempArray = New Byte() {}
+                    TempArray = BitConverter.GetBytes(ReferenceByHeader(i))
+                    Buffer.BlockCopy(TempArray, 0, NewStringFile, &H10 + 12 * i +
+                                     (Num_String_Count.Value * 12), 4)
+                    'Have to add the string in
+                    Buffer.BlockCopy(BytesByHeader(i), 0, NewStringFile, OffsetByHeader(i) +
+                                     (Num_String_Count.Value * 12) +
+                                     (Num_String_Count.Value * Num_Max_Length.Value),
+                                     BytesByHeader(i).Length)
+                End If
+            Next
+            'All old String Headers have Been Added to the final array to be saved
+            If Base_String_Location = 0 Then
+                Base_String_Location = StringCount - 1
+            End If
+            MessageBox.Show(Hex(Base_String_Location * 12))
+            'Now to make our new headers for our new strings
+            For i As Integer = 0 To Num_String_Count.Value - 1
+                'offset location first
+                Dim TempArray As Byte() = New Byte() {}
+                TempArray = BitConverter.GetBytes(CInt(OffsetByHeader(Base_String_Location - 1) +
+                                                                LengthByHeader(Base_String_Location - 1) +
+                                                                Num_String_Count.Value * 12 +
+                                                                i * Num_Max_Length.Value))
+                Buffer.BlockCopy(TempArray, 0, NewStringFile, Base_String_Location * 12 + &H8 + 12 * i, 4)
+                'then length
+                TempArray = New Byte() {}
+                TempArray = BitConverter.GetBytes(CInt(Num_Max_Length.Value))
+                Buffer.BlockCopy(TempArray, 0, NewStringFile, Base_String_Location * 12 + &HC + 12 * i, 4)
+                'then referece number
+                TempArray = New Byte() {}
+                TempArray = BitConverter.GetBytes(CInt(Num_Start_Num.Value + i))
+                Buffer.BlockCopy(TempArray, 0, NewStringFile, Base_String_Location * 12 + &H10 + 12 * i, 4)
+            Next
+            'now all of the new headers have been added, Old Strings have been added, only new strings have to be added
+
+            'This old command added all of the old text
+            'Buffer.BlockCopy(FileBytes, OffsetByHeader(0) - Num_String_Count.Value * 12, NewStringFile, 8 + StringCount * 12 + Num_String_Count.Value * 12, FileBytes.Count - OffsetByHeader(0) - 1 + Num_String_Count.Value * 12)
+
+
+            Dim TextArray() As String
+            Using MyReader As New Microsoft.VisualBasic.FileIO.TextFieldParser(Sent_CSV) 'Sent_CSV
+                MyReader.TextFieldType = Microsoft.VisualBasic.FileIO.FieldType.Delimited
+                MyReader.SetDelimiters({vbTab, ","})
+                Dim counter As Integer = 0
+                Do While Not MyReader.EndOfData
+                    Try
+                        TextArray = MyReader.ReadFields
+                        Dim bytearray() As Byte
+                        'MessageBox.Show(TextArray.Length)
+                        Try
+                            bytearray = System.Text.Encoding.ASCII.GetBytes(TextArray(0))
+                        Catch ex As Exception
+                            MessageBox.Show(ex.Message & counter & TextArray(0)) '& TextArray(i) 
+                        End Try
+                        Buffer.BlockCopy(bytearray, 0, NewStringFile, OffsetByHeader(Base_String_Location) +
+                                                                        12 * Num_String_Count.Value +
+                                                                        Num_Max_Length.Value * counter, bytearray.Length)
+
+                        'For j As Integer = 0 To Num_Max_Length.Value - 1
+                        'Try
+                        'If j < bytearray.Length Then
+                        'NewStringFile(OffsetByHeader(Base_String_Location) +
+                        'LengthByHeader(Base_String_Location) +
+                        'counter * Num_Max_Length.Value + j) = bytearray(j)
+                        'End If
+                        '           Catch ex As Exception
+                        '              MessageBox.Show("Error: " & counter & " " & TextArray(0) & " " & j & " " & Mid(TextArray(0), j - 1, j))
+                        '         End Try
+                        '            Next
+                    Catch ex As FileIO.MalformedLineException
+                        Stop
+                    End Try
+                    counter = counter + 1
+                Loop
+            End Using
+            Try
+                File.WriteAllBytes(Saved_String, NewStringFile)
+            Catch ex As Exception
+                'MessageBox.Show(ex.Message)
+            End Try
+            MessageBox.Show("String Built")
+        End If
+    End Sub
+#End Region
 End Class

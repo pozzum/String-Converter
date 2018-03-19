@@ -58,7 +58,7 @@ Partial Class Form2
         '
         Me.NumericMain.Hexadecimal = True
         Me.NumericMain.Location = New System.Drawing.Point(12, 38)
-        Me.NumericMain.Maximum = New Decimal(New Integer() {1000000, 0, 0, 0})
+        Me.NumericMain.Maximum = New Decimal(New Integer() {50000000, 0, 0, 0})
         Me.NumericMain.Name = "NumericMain"
         Me.NumericMain.Size = New System.Drawing.Size(156, 20)
         Me.NumericMain.TabIndex = 2
@@ -66,14 +66,15 @@ Partial Class Form2
         'TextBoxMain
         '
         Me.TextBoxMain.Location = New System.Drawing.Point(12, 64)
+        Me.TextBoxMain.Multiline = True
         Me.TextBoxMain.Name = "TextBoxMain"
         Me.TextBoxMain.ReadOnly = True
-        Me.TextBoxMain.Size = New System.Drawing.Size(156, 20)
+        Me.TextBoxMain.Size = New System.Drawing.Size(156, 80)
         Me.TextBoxMain.TabIndex = 3
         '
         'ButtonDelete
         '
-        Me.ButtonDelete.Location = New System.Drawing.Point(12, 90)
+        Me.ButtonDelete.Location = New System.Drawing.Point(12, 149)
         Me.ButtonDelete.Name = "ButtonDelete"
         Me.ButtonDelete.Size = New System.Drawing.Size(75, 23)
         Me.ButtonDelete.TabIndex = 4
@@ -82,7 +83,7 @@ Partial Class Form2
         '
         'ButtonEdit
         '
-        Me.ButtonEdit.Location = New System.Drawing.Point(93, 90)
+        Me.ButtonEdit.Location = New System.Drawing.Point(93, 149)
         Me.ButtonEdit.Name = "ButtonEdit"
         Me.ButtonEdit.Size = New System.Drawing.Size(75, 23)
         Me.ButtonEdit.TabIndex = 5
@@ -91,7 +92,7 @@ Partial Class Form2
         '
         'ButtonAdd
         '
-        Me.ButtonAdd.Location = New System.Drawing.Point(12, 119)
+        Me.ButtonAdd.Location = New System.Drawing.Point(12, 178)
         Me.ButtonAdd.Name = "ButtonAdd"
         Me.ButtonAdd.Size = New System.Drawing.Size(75, 23)
         Me.ButtonAdd.TabIndex = 6
@@ -100,7 +101,7 @@ Partial Class Form2
         '
         'ButtonMerge
         '
-        Me.ButtonMerge.Location = New System.Drawing.Point(93, 119)
+        Me.ButtonMerge.Location = New System.Drawing.Point(93, 178)
         Me.ButtonMerge.Name = "ButtonMerge"
         Me.ButtonMerge.Size = New System.Drawing.Size(75, 23)
         Me.ButtonMerge.TabIndex = 7
@@ -111,8 +112,8 @@ Partial Class Form2
         '
         Me.NumericSecondary.Enabled = False
         Me.NumericSecondary.Hexadecimal = True
-        Me.NumericSecondary.Location = New System.Drawing.Point(12, 148)
-        Me.NumericSecondary.Maximum = New Decimal(New Integer() {1000000, 0, 0, 0})
+        Me.NumericSecondary.Location = New System.Drawing.Point(12, 207)
+        Me.NumericSecondary.Maximum = New Decimal(New Integer() {50000000, 0, 0, 0})
         Me.NumericSecondary.Name = "NumericSecondary"
         Me.NumericSecondary.ReadOnly = True
         Me.NumericSecondary.RightToLeft = System.Windows.Forms.RightToLeft.No
@@ -121,16 +122,17 @@ Partial Class Form2
         '
         'TextBoxSecondary
         '
-        Me.TextBoxSecondary.Location = New System.Drawing.Point(12, 174)
+        Me.TextBoxSecondary.Location = New System.Drawing.Point(12, 233)
+        Me.TextBoxSecondary.Multiline = True
         Me.TextBoxSecondary.Name = "TextBoxSecondary"
         Me.TextBoxSecondary.ReadOnly = True
-        Me.TextBoxSecondary.Size = New System.Drawing.Size(156, 20)
+        Me.TextBoxSecondary.Size = New System.Drawing.Size(156, 80)
         Me.TextBoxSecondary.TabIndex = 9
         '
         'LabelLength
         '
         Me.LabelLength.AutoSize = True
-        Me.LabelLength.Location = New System.Drawing.Point(9, 197)
+        Me.LabelLength.Location = New System.Drawing.Point(9, 316)
         Me.LabelLength.Name = "LabelLength"
         Me.LabelLength.Size = New System.Drawing.Size(113, 13)
         Me.LabelLength.TabIndex = 10
@@ -140,7 +142,7 @@ Partial Class Form2
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(180, 218)
+        Me.ClientSize = New System.Drawing.Size(180, 338)
         Me.Controls.Add(Me.LabelLength)
         Me.Controls.Add(Me.TextBoxSecondary)
         Me.Controls.Add(Me.NumericSecondary)

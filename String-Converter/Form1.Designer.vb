@@ -88,7 +88,7 @@ Partial Class Form1
         Me.Num_Max_Length.Name = "Num_Max_Length"
         Me.Num_Max_Length.Size = New System.Drawing.Size(83, 20)
         Me.Num_Max_Length.TabIndex = 4
-        Me.Num_Max_Length.Value = New Decimal(New Integer() {30, 0, 0, 0})
+        Me.Num_Max_Length.Value = New Decimal(New Integer() {32, 0, 0, 0})
         '
         'Label2
         '
