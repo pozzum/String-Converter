@@ -69,7 +69,7 @@ Public Class Form2
     End Sub
     Sub RebuildFile(Optional deletedindex As Integer = 1000000)
         'Moving Removed Index To Back And Removing
-        Dim TempArray() As Byte '= New Byte(MaxReadableLength - 1) {}
+        Dim TempArray() As Byte = New Byte(CurrentLength + TextBoxMain.Text.Length - OldText.Length) {}
         'MessageBox.Show("Copy New String Count")
         'Copying Over The New String Count
         If deletedindex <> 1000000 Then

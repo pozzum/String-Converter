@@ -41,7 +41,7 @@ Partial Class Form2
         Me.TextBoxActiveFile.Location = New System.Drawing.Point(74, 12)
         Me.TextBoxActiveFile.Name = "TextBoxActiveFile"
         Me.TextBoxActiveFile.ReadOnly = True
-        Me.TextBoxActiveFile.Size = New System.Drawing.Size(94, 20)
+        Me.TextBoxActiveFile.Size = New System.Drawing.Size(198, 20)
         Me.TextBoxActiveFile.TabIndex = 0
         '
         'Label1
@@ -59,7 +59,7 @@ Partial Class Form2
         Me.NumericMain.Location = New System.Drawing.Point(12, 38)
         Me.NumericMain.Maximum = New Decimal(New Integer() {50000000, 0, 0, 0})
         Me.NumericMain.Name = "NumericMain"
-        Me.NumericMain.Size = New System.Drawing.Size(156, 20)
+        Me.NumericMain.Size = New System.Drawing.Size(260, 20)
         Me.NumericMain.TabIndex = 2
         '
         'TextBoxMain
@@ -68,41 +68,41 @@ Partial Class Form2
         Me.TextBoxMain.Multiline = True
         Me.TextBoxMain.Name = "TextBoxMain"
         Me.TextBoxMain.ReadOnly = True
-        Me.TextBoxMain.Size = New System.Drawing.Size(156, 80)
+        Me.TextBoxMain.Size = New System.Drawing.Size(260, 120)
         Me.TextBoxMain.TabIndex = 3
         '
         'ButtonDelete
         '
-        Me.ButtonDelete.Location = New System.Drawing.Point(12, 149)
+        Me.ButtonDelete.Location = New System.Drawing.Point(12, 190)
         Me.ButtonDelete.Name = "ButtonDelete"
-        Me.ButtonDelete.Size = New System.Drawing.Size(75, 23)
+        Me.ButtonDelete.Size = New System.Drawing.Size(125, 23)
         Me.ButtonDelete.TabIndex = 4
         Me.ButtonDelete.Text = "Delete"
         Me.ButtonDelete.UseVisualStyleBackColor = True
         '
         'ButtonEdit
         '
-        Me.ButtonEdit.Location = New System.Drawing.Point(93, 149)
+        Me.ButtonEdit.Location = New System.Drawing.Point(147, 190)
         Me.ButtonEdit.Name = "ButtonEdit"
-        Me.ButtonEdit.Size = New System.Drawing.Size(75, 23)
+        Me.ButtonEdit.Size = New System.Drawing.Size(125, 23)
         Me.ButtonEdit.TabIndex = 5
         Me.ButtonEdit.Text = "Edit"
         Me.ButtonEdit.UseVisualStyleBackColor = True
         '
         'ButtonAdd
         '
-        Me.ButtonAdd.Location = New System.Drawing.Point(12, 178)
+        Me.ButtonAdd.Location = New System.Drawing.Point(12, 219)
         Me.ButtonAdd.Name = "ButtonAdd"
-        Me.ButtonAdd.Size = New System.Drawing.Size(75, 23)
+        Me.ButtonAdd.Size = New System.Drawing.Size(125, 23)
         Me.ButtonAdd.TabIndex = 6
         Me.ButtonAdd.Text = "Add"
         Me.ButtonAdd.UseVisualStyleBackColor = True
         '
         'ButtonMerge
         '
-        Me.ButtonMerge.Location = New System.Drawing.Point(93, 178)
+        Me.ButtonMerge.Location = New System.Drawing.Point(147, 219)
         Me.ButtonMerge.Name = "ButtonMerge"
-        Me.ButtonMerge.Size = New System.Drawing.Size(75, 23)
+        Me.ButtonMerge.Size = New System.Drawing.Size(125, 23)
         Me.ButtonMerge.TabIndex = 7
         Me.ButtonMerge.Text = "Merge"
         Me.ButtonMerge.UseVisualStyleBackColor = True
@@ -111,28 +111,28 @@ Partial Class Form2
         '
         Me.NumericSecondary.Enabled = False
         Me.NumericSecondary.Hexadecimal = True
-        Me.NumericSecondary.Location = New System.Drawing.Point(12, 207)
+        Me.NumericSecondary.Location = New System.Drawing.Point(12, 248)
         Me.NumericSecondary.Maximum = New Decimal(New Integer() {50000000, 0, 0, 0})
         Me.NumericSecondary.Name = "NumericSecondary"
         Me.NumericSecondary.ReadOnly = True
         Me.NumericSecondary.RightToLeft = System.Windows.Forms.RightToLeft.No
-        Me.NumericSecondary.Size = New System.Drawing.Size(156, 20)
+        Me.NumericSecondary.Size = New System.Drawing.Size(260, 20)
         Me.NumericSecondary.TabIndex = 8
         '
         'TextBoxSecondary
         '
-        Me.TextBoxSecondary.Location = New System.Drawing.Point(12, 233)
+        Me.TextBoxSecondary.Location = New System.Drawing.Point(12, 274)
         Me.TextBoxSecondary.Multiline = True
         Me.TextBoxSecondary.Name = "TextBoxSecondary"
         Me.TextBoxSecondary.ReadOnly = True
-        Me.TextBoxSecondary.Size = New System.Drawing.Size(156, 80)
+        Me.TextBoxSecondary.Size = New System.Drawing.Size(260, 80)
         Me.TextBoxSecondary.TabIndex = 9
         '
         'Form2
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(180, 321)
+        Me.ClientSize = New System.Drawing.Size(284, 361)
         Me.Controls.Add(Me.TextBoxSecondary)
         Me.Controls.Add(Me.NumericSecondary)
         Me.Controls.Add(Me.ButtonMerge)
