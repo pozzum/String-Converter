@@ -284,12 +284,12 @@ Public Class Form2
             End If
             If Resize Then
                 LegnthDifference = TextBoxMain.Text.Length - LengthByHeader(EditedIndex) + 1 ' Shorter is - Longer is +
-                MessageBox.Show("Change Length")
+                ' MessageBox.Show("Change Length")
                 LengthByHeader(EditedIndex) = LengthByHeader(EditedIndex) + LegnthDifference
             Else
                 LegnthDifference = 0
             End If
-            MessageBox.Show(LengthByHeader(EditedIndex))
+            ' MessageBox.Show(LengthByHeader(EditedIndex))
             Dim NewTextBytes As Byte() = New Byte(LengthByHeader(EditedIndex)) {}
             Buffer.BlockCopy(System.Text.Encoding.ASCII.GetBytes(TextBoxMain.Text), 0, NewTextBytes, 0, System.Text.Encoding.ASCII.GetBytes(TextBoxMain.Text).Length)
             BytesByHeader(EditedIndex) = NewTextBytes
