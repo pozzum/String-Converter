@@ -10,13 +10,14 @@ Public Class Form2
     Dim CurrentIndexMain = 0
     Dim CurrentIndexSecondary = 0
     Dim CurrentLength = 0
-
+    Dim LegnthDifference As Integer
 
     Private Sub Form2_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         TextBoxActiveFile.Text = Form1.SentFile
         ProcessString(True)
         ReadMainReference()
         ReadSecondReference()
+        SuperWarn.resetsettings()
     End Sub
     Sub ProcessString(Optional Backup As Boolean = False)
         'Creating Origional Backup
@@ -69,7 +70,7 @@ Public Class Form2
     End Sub
     Sub RebuildFile(Optional deletedindex As Integer = 1000000)
         'Moving Removed Index To Back And Removing
-        Dim TempArray() As Byte = New Byte(CurrentLength + TextBoxMain.Text.Length - OldText.Length) {}
+        Dim TempArray() As Byte = New Byte(CurrentLength + LegnthDifference) {}
         'MessageBox.Show("Copy New String Count")
         'Copying Over The New String Count
         If deletedindex <> 1000000 Then
@@ -252,7 +253,7 @@ Public Class Form2
             ButtonMerge.Text = "Merge"
         End If
     End Sub
-    Dim OldText As String = ""
+    Public OldText As String = ""
     Private Sub ButtonEdit_Click(sender As Object, e As EventArgs) Handles ButtonEdit.Click
         If ButtonEdit.Text = "Edit" Then
             NumericMain.ReadOnly = True
@@ -265,22 +266,42 @@ Public Class Form2
             ButtonEdit.Text = "Save"
         Else ' if ButtonEdit.Text = "Save" then
             'Save the File First
-            Dim Difference As Integer = TextBoxMain.Text.Length - OldText.Length ' Shorter is - Longer is +
+
             Dim EditedIndex As Integer = Array.IndexOf(ReferenceByHeader, CInt(NumericMain.Value))
             'Edit the Edited Index
-            LengthByHeader(EditedIndex) = LengthByHeader(EditedIndex) + Difference
+            Dim Resize As Boolean = True
+            If ReferenceByHeader(EditedIndex) >= &HCA00 AndAlso ReferenceByHeader(EditedIndex) < &HEA00 Then
+                If SuperWarn.Dontask Then
+                    Resize = SuperWarn.SavedResult
+                ElseIf SuperWarn.ShowDialog() = DialogResult.OK Then ' Keep Length
+                    Resize = False
+                Else ' Change Length
+                    Resize = True
+                End If
+                If SuperWarn.Dontask Then
+                    SuperWarn.SavedResult = Resize
+                End If
+            End If
+            If Resize Then
+                LegnthDifference = TextBoxMain.Text.Length - LengthByHeader(EditedIndex) + 1 ' Shorter is - Longer is +
+                MessageBox.Show("Change Length")
+                LengthByHeader(EditedIndex) = LengthByHeader(EditedIndex) + LegnthDifference
+            Else
+                LegnthDifference = 0
+            End If
+            MessageBox.Show(LengthByHeader(EditedIndex))
             Dim NewTextBytes As Byte() = New Byte(LengthByHeader(EditedIndex)) {}
-            Buffer.BlockCopy(System.Text.Encoding.ASCII.GetBytes(TextBoxMain.Text), 0, NewTextBytes, 0, LengthByHeader(EditedIndex) - 1)
+            Buffer.BlockCopy(System.Text.Encoding.ASCII.GetBytes(TextBoxMain.Text), 0, NewTextBytes, 0, System.Text.Encoding.ASCII.GetBytes(TextBoxMain.Text).Length)
             BytesByHeader(EditedIndex) = NewTextBytes
             'Adjusting the offsets for the changed difference
             Dim TempIndex As Integer = EditedIndex + 1
             While TempIndex < OffsetByHeader.Length
                 Try
-                    OffsetByHeader(TempIndex) = OffsetByHeader(TempIndex) + Difference
+                    OffsetByHeader(TempIndex) = OffsetByHeader(TempIndex) + LegnthDifference
                     TempIndex = TempIndex + 1
                 Catch ex As Exception
                     MessageBox.Show(TempIndex & vbNewLine &
-                                ex.Message)
+                               ex.Message)
                 End Try
             End While
             'Rebuild The File
@@ -397,53 +418,6 @@ Public Class Form2
             Catch ex As Exception
                 MessageBox.Show(TempIndex & vbNewLine & ex.Message)
             End Try
-            'For i As Integer = 0 To OldReferenceByHeader.Length - 1
-            ''Try
-            'If OldReferenceByHeader(i) < NumericSecondary.Value Then
-            '    OffsetByHeader(i) = OldOffsetByHeader(i)
-            '    LengthByHeader(i) = OldLengthByHeader(i)
-            '    ReferenceByHeader(i) = OldReferenceByHeader(i)
-            '    BytesByHeader(i) = OldBytesByHeader(i)
-            'ElseIf OldReferenceByHeader(i) > NumericSecondary.Value Then
-            '    If WorkingIndex = 0 Then 'Insert new string and copy the last string
-            '        WorkingIndex = i
-            '        OffsetByHeader(i) = OldOffsetByHeader(OldOffsetByHeader.Length - 1) + OldLengthByHeader(OldLengthByHeader.Length - 1)
-            '        LengthByHeader(i) = TextBoxSecondary.Text.Length + 1
-            '        ReferenceByHeader(i) = NumericSecondary.Value
-            '        Dim NewTextBytes As Byte() = New Byte(LengthByHeader(i) - 1) {}
-            '        Buffer.BlockCopy(System.Text.Encoding.ASCII.GetBytes(TextBoxSecondary.Text), 0, NewTextBytes, 0, LengthByHeader(i) - 1)
-            '        BytesByHeader(i) = New Byte(LengthByHeader(i) - 1) {}
-            '        BytesByHeader(i) = NewTextBytes
-            '        '--------------
-            '        OffsetByHeader(i + 1) = OldOffsetByHeader(i)
-            '        LengthByHeader(i + 1) = OldLengthByHeader(i)
-            '        ReferenceByHeader(i + 1) = OldReferenceByHeader(i)
-            '        'BytesByHeader(i + 1) = OldBytesByHeader(i)
-            '        Dim temparray As Byte() = New Byte(OldBytesByHeader(i).Length - 1) {}
-            '        BytesByHeader(i + 1) = temparray
-            '        BytesByHeader(i + 1) = OldBytesByHeader(i)
-            '        'Array.Copy(OldBytesByHeader(i), 0, BytesByHeader(i + 1), 0, OldBytesByHeader(i).Length - 1)
-            '    Else
-            '        OffsetByHeader(i + 1) = OldOffsetByHeader(i)
-            '        LengthByHeader(i + 1) = OldLengthByHeader(i)
-            '        ReferenceByHeader(i + 1) = OldReferenceByHeader(i)
-            '        Dim temparray As Byte() = New Byte(OldBytesByHeader(i).Length - 1) {}
-            '        BytesByHeader(i + 1) = temparray
-            '        BytesByHeader(i + 1) = OldBytesByHeader(i)
-            '        MessageBox.Show(System.Text.Encoding.ASCII.GetString(OldBytesByHeader(i)))
-            '        'Array.Copy(OldBytesByHeader(i), 0, BytesByHeader(i + 1), 0, OldBytesByHeader(i).Length - 1)
-            '    End If
-            'End If
-            'Catch ex As Exception
-            'MessageBox.Show(i & vbNewLine & ex.Message)
-            'End Try
-            'OffsetByHeader(OffsetByHeader.Length - 1) = OffsetByHeader(OffsetByHeader.Length - 2) + LengthByHeader(OffsetByHeader.Length - 2)
-            'LengthByHeader(LengthByHeader.Length - 1) = TextBoxSecondary.Text.Length + 1
-            'ReferenceByHeader(ReferenceByHeader.Length - 1) = NumericSecondary.Value
-            'Dim NewTextBytes As Byte() = New Byte(LengthByHeader(LengthByHeader.Length - 1)) {}
-            'Buffer.BlockCopy(System.Text.Encoding.ASCII.GetBytes(TextBoxSecondary.Text), 0, NewTextBytes, 0, LengthByHeader(LengthByHeader.Length - 1) - 1)
-            'BytesByHeader(LengthByHeader.Length - 1) = NewTextBytes
-            'Adding the 12 header bytes from all
             For i As Integer = 0 To OffsetByHeader.Length - 1
                 OffsetByHeader(i) = OffsetByHeader(i) + 12
             Next
